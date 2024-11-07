@@ -1,0 +1,801 @@
+
+#include<iostream>
+#include<string>
+#include<iomanip>
+using namespace std;
+// Cau truc goi dich vu
+typedef struct Goidichvu{
+	string Tengoi;
+	long long Giamoigoi;
+	int Soluong; 
+}GV;
+// Thoi gian
+typedef struct{
+	int gio;
+	string ngay;
+}Time;
+// cau truc benh nhan
+typedef struct Benhnhan{
+	string Hovaten;
+	long long soCCCD;
+	string Diachi;
+	int Tuoi;
+	string Gioitinh;
+	long long ID;
+	Time Giodatlich;
+	GV Dichvu;
+	GV Dichvu2;
+	long long Tongchi;
+}BN;
+// Cau truc node
+struct Node{
+	BN data;
+	Node* next;
+};
+typedef struct Node* node;
+// Cau truc danh sach lien ket chua du lieu o khau 1
+typedef struct List{
+	node head;
+	node tail;
+	int size;
+	node Makenode(BN a);
+	void Themdau(BN a);
+	void Sapxep();
+	void Sua(BN &a);
+	node Xoa(BN a);
+	node Timkiem(long long ID);
+	void Indanhsach();
+	List();
+}ls;
+// tao 1 node voi kieu du lieu BN 
+node ls::Makenode(BN a){
+	node p = new Node();
+	p->data = a;
+	p->next = NULL;
+	return p;
+}
+// truyen du lieu bien toan cuc
+ls::List(){
+	head = NULL;
+	tail = NULL;
+	size = 0;
+}
+// Them BN vao dau danh sach
+void ls::Themdau(BN a){
+	node d = Makenode(a);
+    if(head == NULL){
+        head = d;
+    }
+    else{
+        d->next = head;
+        head = d;
+    }
+    size++;
+}
+// Sua du lieu neu co sai sot
+void ls::Sua(BN &a){
+    node p = head;
+    while ( p != NULL) {
+        if (p->data.ID ==  a.ID) {
+            cout << "\nSUA THONG TIN BENH NHAN:" << endl;
+            cout << "\nNhap ho ten benh nhan: ";
+            cin.ignore();getline(cin, a.Hovaten);
+            cout << "\nNhap tuoi: ";cin >> a.Tuoi;
+            cout << "\nNhap gioi tinh: ";
+            cin.ignore();getline(cin, a.Gioitinh);
+            cout << "\nNhap dia chi: ";
+			cin.ignore();getline(cin, a.Diachi);
+            cout <<"\nNhap so CCCD :";
+            cin >> a.soCCCD;
+            cout <<"\nThanh cong";
+            break;
+        }
+        p = p->next;
+    }
+    if (p == NULL) { cout << "Khong tim thay benh nhan voi ID: " << a.ID << endl; }
+}
+// Xoa benh nhan ban OR huy lich
+node ls::Xoa(BN a){
+	node p = head;
+	int pos = 1;
+	while(p != NULL && p->data.ID != a.ID){
+		pos++;
+		p = p->next;
+	}
+	if(pos <= 0 || pos > size){
+        cout <<"Khong co benh nhan nay trong danh sach"<<endl;
+    }
+    node truoc = NULL, sau = head;
+    for(int i = 1 ; i < pos ; i++){ 
+        truoc = sau;
+        sau = sau->next;
+    }
+    if(truoc == NULL){
+        head = head->next;
+    }
+    else{
+        truoc->next = sau->next;
+    }
+    size--;
+}
+// Tim kiem va in thong tin benh nhan 
+node ls::Timkiem(long long id){
+		node p = head;
+		while(p != NULL){
+			if(p->data.ID == id){
+				return p;
+			}
+			p = p->next;
+		}
+}
+// Sap xep danh sach dua vao thoi gian dang ki theo thu tu tang dan { BUBBLE Sort}
+void ls::Sapxep(){
+    for (node p = head; p != NULL; p = p->next) {
+        for (node q = p->next; q != NULL; q = q->next) {
+            if (p->data.Giodatlich.gio > q->data.Giodatlich.gio) {
+                BN temp = p->data;
+                p->data = q->data;
+                q->data = temp;
+            }
+        }
+    }
+}
+// In danh sach 
+void ls::Indanhsach(){
+	ls::Sapxep(); // Sap xep danh sach truoc khi in
+    cout << "Danh sach benh nhan:\n";
+    
+    cout << left << setw(5) << "STT" 
+         << setw(20) << "Ten"
+		 << setw(10) << "Tuoi"  
+		 << setw(15) << "Gioi tinh"  
+         << setw(20) << "Dia chi" 
+         << setw(15) << "So CCCD" 
+         << setw(10) << "Ma ID" 
+         << setw(25) << "Thoi gian dang ki" << endl;
+    cout << "-----------------------------------------------------------------------------------------------------------\n";
+
+    int stt = 1;
+    node p = head;
+    while (p != NULL) {
+        cout << setw(5) << stt
+             << setw(20) << p->data.Hovaten
+			 << setw(10) << p->data.Tuoi
+			 << setw(15) << p->data.Gioitinh
+             << setw(20) << p->data.Diachi
+             << setw(15) << p->data.soCCCD
+             << setw(10) << p->data.ID
+             << setw(25) << p->data.Giodatlich.ngay<< p->data.Giodatlich.gio <<" :00"<<endl;
+        p = p->next;
+        stt++;
+    }
+}
+
+// Hang doi 
+typedef struct Queue{
+	node head;
+	int Size;
+	long long Doanhthu;
+	node makeNode(BN a);
+	bool isEmpty();
+	void Enqueue(BN a);
+	node Dequeue();
+	void Nhapgoidichvu(BN &a, int n);
+	void Nhapgoidichvu2(BN &a, int n);
+	void Inbienlaithutien(BN &a);
+	long long Tongdoanhthu();
+	Queue();
+}Q;
+Q::Queue(){
+	head = NULL;
+	Doanhthu = 0;
+	Size = 0;
+}
+// Tao 1 node voi kieu du lieu la BN 
+node Q::makeNode(BN a){
+	node p = new Node;
+	p->data = a;
+	p->next = NULL;
+	return p;
+}
+// Kiem tra rong 
+bool Q::isEmpty(){
+	if(head == NULL){
+		return false;
+	}
+	return true;
+}
+// Them BN vao hang doi 
+void Q::Enqueue(BN a){
+	node cuoi = makeNode(a);
+	if (head == NULL) {
+		head = cuoi;
+	} else {
+		node p = head;
+		while (p->next != NULL) {
+			p = p->next;
+		}
+		p->next = cuoi;
+	}
+	Size++;
+}
+// Xoa BN ra khoi hang doi 
+node Q::Dequeue() {
+	if (isEmpty()) {
+		return NULL;
+	}
+	node p = head;
+	head = head->next;
+	Size--;
+	return p;
+}
+// Nhap vao goi dich vu 
+void Q::Nhapgoidichvu(BN &a, int n){
+	int c;
+	a.Dichvu2.Giamoigoi = 0;
+	a.Dichvu2.Soluong = 0;
+		switch (n)
+    	{
+        //  Goi dich vu co ban
+    	case 1:{ 
+		    a.Dichvu.Tengoi = "Tay trang rang";
+			a.Dichvu.Soluong = 1; 
+        	cout <<"1.Lazer" <<"\n2.Tai nha";
+			cout <<"\nLua chon : ";cin >>c;
+        	if(c == 1){
+           		a.Dichvu.Giamoigoi = 5000;
+			}
+        	if(c == 2){
+				a.Dichvu.Giamoigoi = 3000;
+			}
+        	cout <<"\nThem dich vu thanh cong"<<endl;  
+        	break;
+		}
+    	case 2 :
+        	a.Dichvu.Tengoi = "Tram rang tham mi";
+        	cout << "Nhap so luong rang : "; cin >> a.Dichvu.Soluong;
+        	cout << "1.Composite" << "\n2.Phong ngua\n";
+			cout <<"\nLua chon : ";cin >>c;
+        	if(c == 1){
+            	a.Dichvu.Giamoigoi = 500;
+			}
+        	if(c == 2){
+            	a.Dichvu.Giamoigoi = 300;
+			}
+			cout <<"\nThem dich vu thanh cong"<<endl; 
+        	break;
+    	case 3 :
+        	a.Dichvu.Tengoi = "Cao voi rang";
+			a.Dichvu.Soluong= 1;
+        	a.Dichvu.Giamoigoi = 200;
+        	cout <<"\nThem dich vu thanh cong"<<endl; 
+        	break;
+    	case 4 :
+        	a.Dichvu.Tengoi = "Dieu tri tuy";
+			a.Dichvu.Soluong= 1;
+        	cout << "1.Rang cua"<<"\n2.Rang ham\n";
+			cout <<"\nLua chon : ";cin >>c;
+        	if(c == 1){
+            	a.Dichvu.Giamoigoi = 700;
+			}
+        	if(c == 2){
+           		a.Dichvu.Giamoigoi = 1500;
+			}
+			cout <<"\nThem dich vu thanh cong"<<endl; 
+        	break;
+    	case 5 : 
+        	a.Dichvu.Tengoi = "Ve sinh rang mieng";
+			a.Dichvu.Soluong= 1;
+        	a.Dichvu.Giamoigoi = 300;
+        	cout <<"\nThem dich vu thanh cong"<<endl; 
+        	break;
+    	case 6 : 
+        	a.Dichvu.Tengoi = "Boc rang su";
+        	cout << "Nhap so luong rang :"; cin  >> a.Dichvu.Soluong;
+        	cout <<"\n1.Kim loai"<<"\n2.Zirconia"<<"\n3.Khong kim loai\n";
+			cout <<"\nLua chon : ";cin >>c;
+        	if(c == 1){
+            	a.Dichvu.Giamoigoi = 2500;
+			}
+        	if(c == 2){
+            	a.Dichvu.Giamoigoi = 5000;
+			}
+        	if(c == 3){
+            	a.Dichvu.Giamoigoi = 12000;
+			}
+			cout <<"\nThem dich vu thanh cong"<<endl; 
+        	break;
+        	// Goi dich vu nang cao 
+    	case 7 : 
+        	a.Dichvu.Tengoi = "Nieng rang";
+			a.Dichvu.Soluong= 1;
+        	cout << "1.Kim loai"<<"\n2.Su"<<"\n3.Trong suot\n";
+			cout <<"\nLua chon : ";cin >>c;
+        	if(c == 1){
+            	a.Dichvu.Giamoigoi = 25000;
+			}
+        	if(c == 2){
+            	a.Dichvu.Giamoigoi = 35000;
+			}
+        	if(c == 3){
+            	a.Dichvu.Giamoigoi = 80000;
+			}
+			cout <<"\nThem dich vu thanh cong"<<endl; 
+        	break;
+    	case 8 : 
+        	a.Dichvu.Tengoi = "Phau thuat nha chu";
+			a.Dichvu.Soluong= 1;
+        	a.Dichvu.Giamoigoi = 20000;
+        	cout <<"\nThem dich vu thanh cong"<<endl; 
+        	break;
+    	case 9 : 
+        	a.Dichvu.Tengoi = "Tham mi nu cuoi";
+			a.Dichvu.Soluong= 1;
+    	   	cout << "1.Dan su Veneer"<<"\n2.Thiet ke nu cuoi";
+			cout <<"\nLua chon : ";cin >>c;
+    	    if(c == 1){
+   	        	a.Dichvu.Giamoigoi = 10000;
+			}
+        	if(c == 2){
+            	a.Dichvu.Giamoigoi = 100000;
+			}
+			cout <<"\nThem dich vu thanh cong"<<endl; 
+        	break;
+            default : {
+		 cout <<"Khong co lua chon nay !!! Vui long chon lai"<<endl;
+		}
+	}
+}
+// Nhap vao goi dich vu thu 2 
+void Q::Nhapgoidichvu2(BN &a, int n){
+	int c;
+		switch (n)
+    	{
+        //  Goi dich vu co ban
+    	case 1:{ 
+		    a.Dichvu2.Tengoi = "Tay trang rang";
+			a.Dichvu2.Soluong = 1; 
+        	cout <<"1.Lazer" <<"\n2.Tai nha";
+			cout <<"\nLua chon : ";cin >>c;
+        	if(c == 1){
+           		a.Dichvu2.Giamoigoi = 5000 ;
+			}
+        	if(c == 2){
+				a.Dichvu2.Giamoigoi = 3000;
+			}
+        	cout <<"\nThem dich vu thanh cong"<<endl;  
+        	break;
+		}
+    	case 2 :
+        	a.Dichvu2.Tengoi = "Tram rang tham mi";
+        	cout << "Nhap so luong rang : "; cin >> a.Dichvu2.Soluong;
+        	cout << "1.Composite" << "\n2.Phong ngua\n";
+			cout <<"\nLua chon : ";cin >>c;
+        	if(c == 1){
+            	a.Dichvu2.Giamoigoi = 500;
+			}
+        	if(c == 2){
+            	a.Dichvu2.Giamoigoi = 300;
+			}
+			cout <<"\nThem dich vu thanh cong"<<endl; 
+        	break;
+    	case 3 :
+        	a.Dichvu2.Tengoi = "Cao voi rang";
+			a.Dichvu2.Soluong= 1;
+        	a.Dichvu2.Giamoigoi = 200;
+        	cout <<"\nThem dich vu thanh cong"<<endl; 
+        	break;
+    	case 4 :
+        	a.Dichvu2.Tengoi = "Dieu tri tuy";
+			cout << "Nhap so luong rang :"; cin  >> a.Dichvu2.Soluong;
+        	cout << "\n1.Rang cua"<<"\n2.Rang ham";
+			cout <<"\nLua chon : ";cin >>c;
+        	if(c == 1){
+            	a.Dichvu2.Giamoigoi = 700;
+			}
+        	if(c == 2){
+           		a.Dichvu2.Giamoigoi = 1500;
+			}
+			cout <<"\nThem dich vu thanh cong"<<endl; 
+        	break;
+    	case 5 : 
+        	a.Dichvu2.Tengoi = "Ve sinh rang mieng";
+			a.Dichvu2.Soluong= 1;
+        	a.Dichvu2.Giamoigoi = 300;
+        	cout <<"\nThem dich vu thanh cong"<<endl; 
+        	break;
+    	case 6 : 
+        	a.Dichvu2.Tengoi = "Boc rang su";
+        	cout << "Nhap so luong rang :"; cin  >> a.Dichvu2.Soluong;
+        	cout <<"\n1.Kim loai"<<"\n2.Zirconia"<<"\n3.Khong kim loai\n";
+			cout <<"\nLua chon : ";cin >>c;
+        	if(c == 1){
+            	a.Dichvu2.Giamoigoi = 2500;
+			}
+        	if(c == 2){
+            	a.Dichvu2.Giamoigoi = 5000;
+			}
+        	if(c == 3){
+            	a.Dichvu2.Giamoigoi = 12000;
+			}
+			cout <<"\nThem dich vu thanh cong"<<endl; 
+        	break;
+        	// Goi dich vu nang cao 
+    	case 7 : 
+        	a.Dichvu2.Tengoi = "Nieng rang";
+			a.Dichvu2.Soluong= 1;
+        	cout << "1.Kim loai"<<"\n2.Su"<<"\n3.Trong suot\n";
+			cout <<"\nLua chon : ";cin >>c;
+        	if(c == 1){
+            	a.Dichvu2.Giamoigoi = 25000;
+			}
+        	if(c == 2){
+            	a.Dichvu2.Giamoigoi = 35000;
+			}
+        	if(c == 3){
+            	a.Dichvu2.Giamoigoi = 80000;
+			}
+			cout <<"\nThem dich vu thanh cong"<<endl; 
+        	break;
+    	case 8 : 
+        	a.Dichvu2.Tengoi = "Phau thuat nha chu";
+			a.Dichvu2.Soluong= 1;
+        	a.Dichvu2.Giamoigoi = 20000;
+        	cout <<"\nThem dich vu thanh cong"<<endl; 
+        	break;
+    	case 9 : 
+        	a.Dichvu2.Tengoi = "Tham mi nu cuoi";
+			a.Dichvu2.Soluong= 1;
+    	   	cout << "1.Dan su Veneer"<<"\n2.Thiet ke nu cuoi";
+			cout <<"\nLua chon : ";cin >>c;
+    	    if(c == 1){
+   	        	a.Dichvu2.Giamoigoi = 10000;
+			}
+        	if(c == 2){
+            	a.Dichvu2.Giamoigoi = 100000;
+			}
+			cout <<"\nThem dich vu thanh cong"<<endl; 
+        	break;
+        default : {
+		 cout <<"Khong co lua chon nay !!! Vui long chon lai"<<endl;
+		}
+	}
+}
+// In bien lai ra sau khi da thanh toan 
+void Q::Inbienlaithutien(BN &a){
+	// Neu chua nhap goi dich vu se khong the in
+    if (a.Dichvu.Giamoigoi == 0 && a.Dichvu2.Giamoigoi == 0) {
+        cout << "Khong co dich vu nao duoc chon. Khong the in bien lai"<<endl;
+        
+    }
+    else 
+	{	
+	long long Tonggoi1 = a.Dichvu.Giamoigoi * a.Dichvu.Soluong;
+	long long Tonggoi2 = a.Dichvu2.Giamoigoi * a.Dichvu2.Soluong;
+	const int PHI_KHAM_BENH = 125;
+	cout <<"*******************************************************************************\n";
+	cout <<"  NHA KHOA TAM DUC"<< endl;
+	cout <<"  Dia chi : 450 - 451 Le Van Viet , TP Thu Duc" << endl;
+	cout <<"  Dien thoai : 0123456789"<<endl;
+	cout <<"\n                          \tHOA DON KHAM BENH"<<endl;
+	cout <<"  Ten khach hang: "<< a.Hovaten <<endl;
+	cout <<"  Tuoi: "<<a.Tuoi<<endl;
+	cout <<"  So CCCD: "<< a.soCCCD <<endl;
+	cout <<"  Dia chi: "<<a.Diachi<<endl;
+
+    cout <<"\n";
+ cout << left << setw(5) << "STT" 
+         << setw(20) << "Goi dich vu" 
+         << setw(15) << "So luong" 
+         << setw(20) << "Don gia " 
+         << setw(15) << "Thanh tien " << endl;
+    cout << "-------------------------------------------------------------------------------\n";
+    cout << setw(5) << "1"
+         << setw(20) << a.Dichvu.Tengoi 
+         << setw(15) << a.Dichvu.Soluong 
+         << setw(20) << a.Dichvu.Giamoigoi 
+         << setw(15) << Tonggoi1 << endl;
+         
+    cout << setw(5) << "2"
+         << setw(20) << a.Dichvu2.Tengoi 
+         << setw(15) << a.Dichvu2.Soluong 
+         << setw(20) << a.Dichvu2.Giamoigoi 
+         << setw(15) << Tonggoi2 << endl;
+         
+    a.Tongchi = Tonggoi1 + Tonggoi2 + PHI_KHAM_BENH;
+    Doanhthu += a.Tongchi;
+    cout <<"\nPhi kham benh :" << PHI_KHAM_BENH <<" Nghin Dong"<<endl;
+	cout << "\nTong chi phi : "<<a.Tongchi<<" Nghin Dong"<<endl;
+	cout <<"\n\n*******************************************************************************";
+	}
+}
+// Tinh doanh thu cua phong kham
+long long Q::Tongdoanhthu(){
+	node p = Dequeue();
+	long long Income = 0;
+	Income += Doanhthu;
+	return Income;
+}
+// Chuyen toan bo du lieu da duoc xu ly o list ---> Queue
+void ChuyenListSangQueue(List &ls, Queue &q) {
+    node p = ls.head; // bat dau tu node dau tien cua list
+    while (p != NULL) {
+        q.Enqueue(p->data);
+        p = p->next; 
+    }
+}
+int main() {
+    ls listBN; // Khoi tao list
+    Q queueBN; // Khoi tao queue
+    int lc;       
+	BN i;
+    while (1) {
+    	cout<<"\n";
+    	cout << "=============================================================================================================";
+    	cout <<"\n"<<endl;
+        cout << "\n---- QUAN LY DANH SACH DAU VAO -----"<<"        |  ----------- QUAN LY HANG DOI BENH NHAN -----------";
+        cout << "\n1. Them benh nhan vao danh sach"<<"             |           7. Chuyen danh sach sang hang doi";
+        cout << "\n2. Sua thong tin benh nhan"<<"                  |           8. Nhap goi dich vu cho benh nhan";
+        cout << "\n3. Xoa benh nhan                            |";
+        cout << "\n4. Tim kiem benh nhan"<<"                       |  ----------- THANH TOAN & DOANH THU ---------------";  
+        cout << "\n5. Sap xep danh sach theo thoi gian dang ky"<<" |           9. In bien lai thanh toan";
+        cout << "\n6. In danh sach benh nhan"<<"                   |           10. Tinh tong doanh thu";
+        cout << "\n0. Thoat";
+        cout << "\n============================================================================================================";
+        cout << "\nNhap lua chon cua ban: ";
+        cin >> lc;
+        switch (lc) {
+            case 1: {
+                BN benhnhan;
+                cout << "\nNhap ho va ten: "; cin.ignore(); getline(cin, benhnhan.Hovaten);
+                cout << "\nNhap tuoi: ";cin >> benhnhan.Tuoi;
+                cout << "\nNhap gioi tinh: ";cin.ignore(); getline(cin, benhnhan.Gioitinh);
+                cout << "\nNhap so CCCD: "; cin >> benhnhan.soCCCD;
+                cout << "\nNhap dia chi: "; cin.ignore(); getline(cin, benhnhan.Diachi);
+                cout << "\nMa ID: "; cin >> benhnhan.ID;
+                // Kiem tra ma ID co bi trung hay khong , neu trung thi nhap lai
+                while(listBN.Timkiem(benhnhan.ID)){
+					cout<<"Ma ID bi trung ! Vui long nhap lai"<<endl;
+					cout << "\nMa ID: "; cin >> benhnhan.ID;
+				}
+                cout << "\nThoi gian dang ki kham: " <<"- Thoi gian: ";cin.ignore(); getline(cin, benhnhan.Giodatlich.ngay );
+											   cout<<"\t\t\t- Gio: ";cin >> benhnhan.Giodatlich.gio;								
+                listBN.Themdau(benhnhan); 
+                break;
+            }
+            case 2: {
+            	long long id;
+                cout << "Nhap ID benh nhan can sua: ";cin >> id;
+            	if(listBN.Timkiem(id) != NULL){
+            		node p = listBN.Timkiem(id);
+                	listBN.Sua(p->data);
+				}
+                break;
+            }
+            case 3: {
+                BN benhnhan;
+                cout << "Nhap ma ID cua benh nhan can xoa: ";
+                cin >> benhnhan.ID;
+                listBN.Xoa(benhnhan);
+                if(listBN.Timkiem(benhnhan.ID)){
+				cout <<"Xoa thanh cong"<<endl;
+				}
+				else {
+				cout <<"Xoa khong thanh cong !"<<endl;
+				}
+                break;
+            }
+            case 4: {
+                long long id;
+                cout << "Nhap ID benh nhan can tim: ";cin >> id;
+                if(listBN.Timkiem(id) != NULL){
+                	node p = listBN.Timkiem(id);
+                	cout <<"Da tim thay benh nhan ! Thong tin benh nhan : ";
+					cout <<"\nTen benh nhan: "<<p->data.Hovaten;
+					cout <<"\nTuoi: "<<p->data.Tuoi;
+					cout <<"\nGoi tinh: "<<p->data.Gioitinh;
+					cout <<"\nDia chi: "<<p->data.Diachi;
+					cout <<"\nSo CCCD: "<<p->data.soCCCD;
+					cout <<"\nMa ID: "<<p->data.ID;
+					cout <<"\nThoi gian dang ki : "<<"- Thoi gian:"<<p->data.Giodatlich.ngay
+												   <<"\n\t\t\t- Gio : "<<p->data.Giodatlich.gio<<" :00";
+					cout <<"\n";
+					}
+				else {
+					cout << "\nKhong tim thay benh nhan";
+					cout <<"\n";
+					}
+                break;
+            }
+            case 5:
+                listBN.Sapxep();
+                cout<<"Sap xep thanh cong "<<endl;
+                break;
+            case 6:
+                listBN.Indanhsach();
+                break;
+            case 7:               
+				ChuyenListSangQueue(listBN, queueBN);
+				cout <<"Chuyen du lieu benh nhan thanh cong !"<<endl;
+                break;
+            case 8: {
+            	i = queueBN.head->data; // Cap nhat benh nhan dau tien trong hang doi 
+            	if ( queueBN.head == NULL) {
+       				cout << "Khong co benh nhan nao trong hang doi." << endl;
+    			}
+    			else 
+				{
+				int d, b;
+				cout <<"Benh nhan " <<i.Hovaten <<"\nMa ID :"<<i.ID<<endl;
+				cout << "\n Vui long chon mo hinh goi dich vu :"<<endl;
+				cout << "\n1. Goi dich vu don";
+				cout << "\n2. Goi dich vu kep\n";
+				cout <<"\nLua chon :";cin >> b;
+				if(b == 1) {
+					cout << "\n------Goi Co Ban ----"<< "------Goi cao cap-------";
+		            cout << "\n1. Tay trang rang"<< "       6. Boc rang su ";
+		            cout << "\n2. Tram rang tham mi"<< "    7. Nieng rang ";
+		            cout << "\n3. Cao voi rang"<< "         8. Phau thuat nha chu";
+		            cout << "\n4. Dieu tri tuy"<< "         9.Tham mi nu cuoi";
+		            cout << "\n5. Ve sinh rang ";
+                    cout <<"\nLua chon :";cin >> d;
+                    if(d == 1){
+                        queueBN.Nhapgoidichvu(i,d);
+                    }
+                    else if(d == 2){
+                        queueBN.Nhapgoidichvu(i,d);
+                    }
+                    else if(d == 3){
+                        queueBN.Nhapgoidichvu(i,d);
+                    }
+                    else if(d == 4){
+                        queueBN.Nhapgoidichvu(i,d);
+                    }
+                    else if(d == 5){
+                        queueBN.Nhapgoidichvu(i,d);
+                    }
+                    else if(d == 6){
+                        queueBN.Nhapgoidichvu(i,d);
+                    }
+                    else if(d == 7){
+                        queueBN.Nhapgoidichvu(i,d);
+                    }
+                    else if(d == 8){
+                        queueBN.Nhapgoidichvu(i,d);
+                    }
+                    else if(d == 9){
+                        queueBN.Nhapgoidichvu(i,d);
+                    }
+                    else {
+                        cout <<"\nLua chon khong hop le";
+                    }
+				}
+				else if(b == 2){
+					int n;
+				cout << "\n------Goi Co Ban ----"<< "------Goi cao cap-------";
+		            cout << "\n1. Tay trang rang"<< "       6. Boc rang su ";
+		            cout << "\n2. Tram rang tham mi"<< "    7. Nieng rang ";
+		            cout << "\n3. Cao voi rang"<< "         8. Phau thuat nha chu";
+		            cout << "\n4. Dieu tri tuy"<< "         9.Tham mi nu cuoi";
+		            cout << "\n5. Ve sinh rang ";
+                    cout << "Lua chon : ";cin >> d;
+					if(d == 1){
+						queueBN.Nhapgoidichvu(i,d);
+						cout <<"\nNhap goi dich vu thu 2 : ";cin >> n; 
+                        if(d != n){
+                            queueBN.Nhapgoidichvu2(i,n);
+                        }
+                        else {
+                            cout <<"\nVui long chon goi dich vu thu 2 khac voi goi dich vu thu 1 !";
+                        }
+                    }
+                    else if(d == 2){
+						queueBN.Nhapgoidichvu(i,d);
+						cout <<"\nNhap goi dich vu thu 2 : ";cin >> n; 
+                        if(d != n){
+                            queueBN.Nhapgoidichvu(i,n);
+                        }
+                        else {
+                            cout <<"\nVui long chon goi dich vu thu 2 khac voi goi dich vu thu 1 !";
+                        }
+                    }
+                    else if(d == 3){
+						queueBN.Nhapgoidichvu(i,d);
+						cout <<"\nNhap goi dich vu thu 2 : ";cin >> n; 
+                        if(d != n){
+                            queueBN.Nhapgoidichvu(i,n);
+                        }
+                        else {
+                            cout <<"\nVui long chon goi dich vu thu 2 khac voi goi dich vu thu 1 !";
+                        }
+                    }
+                    else if(d == 4){
+						queueBN.Nhapgoidichvu(i,d);
+						cout <<"\nNhap goi dich vu thu 2 : ";cin >> n; 
+                        if(d != n){
+                            queueBN.Nhapgoidichvu(i,n);
+                        }
+                        else {
+                            cout <<"\nVui long chon goi dich vu thu 2 khac voi goi dich vu thu 1 !";
+                        }
+                    }
+                    else if(d == 5){
+						queueBN.Nhapgoidichvu(i,d);
+						cout <<"\nNhap goi dich vu thu 2 : ";cin >> n; 
+                        if(d != n){
+                            queueBN.Nhapgoidichvu(i,n);
+                        }
+                        else {
+                            cout <<"\nVui long chon goi dich vu thu 2 khac voi goi dich vu thu 1 !";
+                        }
+                    }
+                    else if(d == 6){
+						queueBN.Nhapgoidichvu(i,d);
+						cout <<"\nNhap goi dich vu thu 2 : ";cin >> n; 
+                        if(d != n){
+                            queueBN.Nhapgoidichvu(i,n);
+                        }
+                        else {
+                            cout <<"\nVui long chon goi dich vu thu 2 khac voi goi dich vu thu 1 !";
+                        }
+                    }
+                    else if(d == 7){
+						queueBN.Nhapgoidichvu(i,d);
+						cout <<"\nNhap goi dich vu thu 2 : ";cin >> n; 
+                        if(d != n){
+                            queueBN.Nhapgoidichvu(i,n);
+                        }
+                        else {
+                            cout <<"\nVui long chon goi dich vu thu 2 khac voi goi dich vu thu 1 !";
+                        }
+                    }
+                    else if(d == 8){
+						queueBN.Nhapgoidichvu(i,d);
+						cout <<"\nNhap goi dich vu thu 2 : ";cin >> n; 
+                        if(d != n){
+                            queueBN.Nhapgoidichvu(i,n);
+                        }
+                        else {
+                            cout <<"\nVui long chon goi dich vu thu 2 khac voi goi dich vu thu 1 !";
+                        }
+                    }
+                    else if(d == 9){
+						queueBN.Nhapgoidichvu(i,d);
+						cout <<"\nNhap goi dich vu thu 2 : ";cin >> n; 
+                        if(d != n){
+                            queueBN.Nhapgoidichvu(i,n);
+                        }
+                        else {
+                            cout <<"\nVui long chon goi dich vu thu 2 khac voi goi dich vu thu 1 !";
+                        }
+                    }
+                    else {
+                        cout <<"\nLua chon khong hop le";
+                    }
+				  }
+				}
+				queueBN.head->data = i;
+				break;	
+            }
+            case 9: {
+                if (queueBN.isEmpty() == false) {
+       				cout << "Khong co benh nhan nao trong hang doi." << endl;
+    			} else {
+        			queueBN.Inbienlaithutien(i);
+        			queueBN.Dequeue();
+        		cout << "\nTThanh toan thanh cong ! Benh nhan " <<i.Hovaten <<" da duoc xoa khoi hang doi"<< endl;
+        		i = queueBN.head->data; // Cap nhat lai con tro head sau khi xoa thanh cong
+    			}
+                break;
+            }
+            case 10:
+                cout << "Tong doanh thu cua phong kham: " << queueBN.Tongdoanhthu() << " Nghin Dong" << endl;
+                break;
+            case 0:
+                cout << "Thoat chuong trinh.\n";
+                return 0;
+            default:
+                cout << "Lua chon khong hop le! Vui long chon lai.\n";
+        }
+    }
+}
